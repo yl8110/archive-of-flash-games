@@ -169,6 +169,7 @@ body {
 }
 .essay a { color: var(--red); text-decoration: underline; }
 .essay a:hover { color: var(--purple); }
+.essay .red, .red { color: var(--red); }   /* plain red emphasis (no underline) */
 
 /* collapsed: only the short phrase shows; expanded: the long text + ▴ */
 .stretch.collapsed > .stretch-body,
