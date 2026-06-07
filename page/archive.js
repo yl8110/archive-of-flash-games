@@ -58,6 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // turn any <<replace "...">>...<<endreplace>> blocks into expandable text
   renderStretchTexts(document.getElementById("mainPanel"));
 
+  // wire up any <div class="random-game"> placeholders
+  setupRandomGames(document.getElementById("mainPanel"));
+
   // reveal mascot + speech bubble, then type the words out
   const bubble = document.getElementById("bubble");
   const mascot = document.getElementById("mascot");
@@ -164,6 +167,91 @@ function makeStretch(node) {
     wrap.classList.replace("expanded", "collapsed");
   });
   return wrap;
+}
+
+/* ============================================================
+   Random Flash game player (Ruffle).
+   Drop <div class="random-game"></div> into a page's content and
+   it becomes a centred clickable line that loads a random .swf.
+   Source: public Flash-game archives on GitHub, served via the
+   jsDelivr CDN and emulated in-browser by Ruffle.
+   ============================================================ */
+const GAMES = [
+  { name: "Mutilate-a-Doll",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/mutilateadoll.swf" },
+  { name: "Reach the Core",   url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/reachthecore.swf" },
+  { name: "Terrasavr",        url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/terrasavr.swf" },
+  { name: "Papa's Bakeria",   url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasbakeria_101.swf" },
+  { name: "Papa's Cheeseria", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papascheeseria_102.swf" },
+  { name: "Papa's Donuteria", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasdonuteria_102.swf" },
+  { name: "Papa's Pastaria",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papaspastaria_v2.swf" },
+  { name: "Papa's Scooperia", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasscooperia_v102.swf" },
+  { name: "Papa's Sushiria",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papassushiria_101.swf" },
+  { name: "Rumble",           url: "https://cdn.jsdelivr.net/gh/Noagi6493/FlashGamesArchive@main/Rumble_Newgrounds.swf" },
+];
+const DEFAULT_GAME_LABEL = "Click here to play a random Flash game from the GitHub Flash Game Archive";
+
+function setupRandomGames(root) {
+  root.querySelectorAll(".random-game").forEach(el => {
+    const label = el.dataset.label || DEFAULT_GAME_LABEL;
+    el.innerHTML = `
+      <p class="play-line"><span class="play-trigger" role="button" tabindex="0">${label}</span></p>
+      <div class="player-frame" hidden>
+        <div class="game-host"></div>
+        <div class="player-status hidden"></div>
+      </div>`;
+    const trigger = el.querySelector(".play-trigger");
+    const frame   = el.querySelector(".player-frame");
+    const host    = el.querySelector(".game-host");
+    const status  = el.querySelector(".player-status");
+    const play = () => { frame.hidden = false; loadRandomGame(host, status); };
+    trigger.addEventListener("click", play);
+    trigger.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(); } });
+  });
+}
+
+// load Ruffle from the CDN on demand (only the first time it's needed)
+let rufflePromise = null;
+function ensureRuffle() {
+  if (window.RufflePlayer && window.RufflePlayer.newest) return Promise.resolve();
+  if (rufflePromise) return rufflePromise;
+  rufflePromise = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/ruffle.js";
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return rufflePromise;
+}
+function whenRuffleReady(cb) {
+  if (window.RufflePlayer && window.RufflePlayer.newest) return cb();
+  const t = setInterval(() => {
+    if (window.RufflePlayer && window.RufflePlayer.newest) { clearInterval(t); cb(); }
+  }, 50);
+  setTimeout(() => clearInterval(t), 10000);
+}
+
+function loadRandomGame(host, status) {
+  status.classList.remove("hidden");
+  status.textContent = "loading…";
+  ensureRuffle().then(() => whenRuffleReady(() => {
+    const game = GAMES[Math.floor(Math.random() * GAMES.length)];
+    status.textContent = "loading " + game.name + "…";
+    const ruffle = window.RufflePlayer.newest();
+    host.innerHTML = "";                       // fresh player each time
+    const player = ruffle.createPlayer();
+    host.appendChild(player);
+    player.load({ url: game.url, autoplay: "on", unmuteOverlay: "visible", scale: "showAll" })
+      .then(() => status.classList.add("hidden"))
+      .catch(err => {
+        console.error(err);
+        status.classList.remove("hidden");
+        status.textContent = "couldn't load " + game.name + " — click the link to try another";
+      });
+  })).catch(() => {
+    status.classList.remove("hidden");
+    status.textContent = "couldn't load the Flash player — check your connection";
+  });
 }
 
 // type segments into a container, character by character
