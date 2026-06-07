@@ -275,6 +275,54 @@ body {
 .flash-player .player-frame { max-width: 600px; }
 .memory-embed { margin-top: 8px; }
 .embed-frame { width: 100%; border: none; display: block; }
+
+/* ---- live are.na comment feed (native-comment-section look) ---- */
+.arena-feed { font-family: "Times New Roman", Times, serif; color: #888; }
+.arena-feed .feed {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.arena-feed .block { width: 100%; position: relative; }
+.arena-feed .block-image { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.arena-feed .block-text-content {
+  width: 100%;
+  padding: 16px;
+  background: #000;
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.arena-feed .block-translation {
+  display: none;
+  padding: 12px 14px 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333;
+  border-top: 1px dashed #999;
+}
+.arena-feed .block.open .block-translation { display: block; }
+.arena-feed .block.has-translation { cursor: pointer; }
+.arena-feed .block.has-translation::after {
+  content: "EN";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  color: #555;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #999;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.arena-feed .block.has-translation:hover::after { opacity: 1; }
+.arena-feed .block.has-translation.open::after { opacity: 0; }
 @media (max-width: 640px) {
   .game-top { flex-direction: column; }
   .game-cover { max-width: 100%; flex-basis: auto; }

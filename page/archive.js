@@ -71,6 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // wire up any <div class="memory-embed" data-src="..."> placeholders
   setupEmbeds(document.getElementById("mainPanel"));
 
+  // wire up any <div class="arena-feed" data-channel="..."> comment feeds
+  setupArenaFeeds(document.getElementById("mainPanel"));
+
   // reveal mascot + speech bubble, then type the words out
   const bubble = document.getElementById("bubble");
   const mascot = document.getElementById("mascot");
@@ -448,6 +451,59 @@ function makeArenaCard(b, cat, internalHref) {
     a.appendChild(body);
   }
   return a;
+}
+
+/* ============================================================
+   Are.na "comment feed" — a single centred column of screenshot
+   blocks (the native-comment-section look), loaded live from a
+   channel. <div class="arena-feed" data-channel="slug"></div>
+   A block with a description becomes click-to-reveal (EN badge).
+   ============================================================ */
+function setupArenaFeeds(root) {
+  root.querySelectorAll(".arena-feed").forEach(el => {
+    const slug = (el.dataset.channel || "").trim();
+    const feed = document.createElement("div");
+    feed.className = "feed";
+    el.appendChild(feed);
+    if (!slug) { feed.textContent = "把 are.na 频道 slug 填进 data-channel"; return; }
+    feed.textContent = "loading…";
+    fetch(`https://api.are.na/v2/channels/${slug}?per=100`)
+      .then(r => r.json())
+      .then(d => {
+        feed.textContent = "";
+        const items = d.contents || [];
+        items.forEach(b => feed.appendChild(makeFeedBlock(b)));
+        if (!items.length) feed.textContent = "Nothing here yet.";
+      })
+      .catch(() => { feed.textContent = "Couldn't load this channel."; });
+  });
+}
+
+function makeFeedBlock(b) {
+  const block = document.createElement("div");
+  block.className = "block";
+  const img = b.image && ((b.image.display && b.image.display.url) || (b.image.original && b.image.original.url));
+  if (img) {
+    const im = document.createElement("img");
+    im.className = "block-image";
+    im.src = img; im.alt = ""; im.loading = "lazy";
+    block.appendChild(im);
+  } else if (b.content || b.title) {
+    const t = document.createElement("div");
+    t.className = "block-text-content";
+    t.textContent = decodeEntities(b.content || b.title);
+    block.appendChild(t);
+  }
+  const desc = b.description ? decodeEntities(b.description) : "";
+  if (desc) {
+    block.classList.add("has-translation");
+    const tr = document.createElement("div");
+    tr.className = "block-translation";
+    tr.textContent = desc;
+    block.appendChild(tr);
+    block.addEventListener("click", () => block.classList.toggle("open"));
+  }
+  return block;
 }
 
 /* ============================================================

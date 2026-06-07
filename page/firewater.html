@@ -17,17 +17,17 @@
   <template id="main">
 
     <!-- ① 游戏名标题(待补充):居中、加粗、红色 -->
-    <h1 class="game-title">(game name 待补充)</h1>
+    <h1 class="game-title">Fireboy and Watergirl in the Forest Temple</h1>
 
     <!-- ② 两栏:左=封面图,右=信息 -->
     <div class="game-top">
       <div class="game-cover">
-        <!-- 封面图待补充。替换下面这行为: <img src="../image/封面图.png" alt="cover"> -->
-        <div class="cover-placeholder">cover image 待补充</div>
+        <img src="../image/firewater-cover.jpg" alt="Fireboy and Watergirl cover" />
       </div>
       <div class="game-meta">
-        <!-- archive 式信息(待补充) -->
-        <p><span class="meta-label">Aliases</span><br>待补充</p>
+        <p><span class="meta-label">Developers:</span> Oslo Albet</p>
+        <p><span class="meta-label">Nationality:</span> Norwegian</p>
+        <p><span class="meta-label">Release Date:</span> November 19, 2009</p>
       </div>
     </div>
 
@@ -37,8 +37,8 @@
     <!-- ④ Memorys 区(左对齐标题) -->
     <h2 class="memories-title">Memories</h2>
 
-    <!-- ⑤ are.na channel(待补充):把频道 slug 填进 data-channel -->
-    <div class="arena-archive" data-channel=""></div>
+    <!-- ⑤ 评论区:are.na 频道 game-fire-water,原生评论区样式(动态加载) -->
+    <div class="arena-feed" data-channel="game-fire-water"></div>
 
   </template>
 
