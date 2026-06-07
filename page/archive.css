@@ -152,7 +152,8 @@ body {
 /* ===================== MAIN CONTENT PANEL ===================== */
 .main-panel {
   flex: 1;
-  min-height: 565px;
+  height: 565px;          /* fixed frame height — change this to resize the box */
+  overflow-y: auto;       /* content taller than the box scrolls INSIDE it */
   background: #fff;
   border: 1px solid var(--border);
   padding: 24px 28px;
