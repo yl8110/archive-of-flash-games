@@ -61,6 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // wire up any <div class="random-game"> placeholders
   setupRandomGames(document.getElementById("mainPanel"));
 
+  // wire up any <div class="arena-archive"> placeholders
+  setupArenaArchives(document.getElementById("mainPanel"));
+
   // reveal mascot + speech bubble, then type the words out
   const bubble = document.getElementById("bubble");
   const mascot = document.getElementById("mascot");
@@ -252,6 +255,112 @@ function loadRandomGame(host, status) {
     status.classList.remove("hidden");
     status.textContent = "couldn't load the Flash player — check your connection";
   });
+}
+
+/* ============================================================
+   Are.na archive grid with category filters.
+   Drop <div class="arena-archive"></div> into a page's content.
+   Pulls blocks from the sub-channels of are.na/.../game-archives
+   and shows them as cards with an  all | archive | live | decay  filter.
+   ============================================================ */
+const ARENA_CATS = [
+  { cat: "archive", slug: "ga-type-archive" },
+  { cat: "live",    slug: "ga-type-live" },
+  { cat: "decay",   slug: "ga-type-decay" },
+];
+const ARENA_FILTERS = ["all", "archive", "live", "decay"];
+
+function setupArenaArchives(root) {
+  root.querySelectorAll(".arena-archive").forEach(el => {
+    const bar = document.createElement("div");
+    bar.className = "arena-filter";
+    ARENA_FILTERS.forEach((f, i) => {
+      if (i) bar.appendChild(Object.assign(document.createElement("span"), { textContent: "|" }));
+      const b = document.createElement("button");
+      b.className = "af-btn" + (f === "all" ? " active" : "");
+      b.dataset.cat = f;
+      b.textContent = f;
+      bar.appendChild(b);
+    });
+    const grid = document.createElement("div");
+    grid.className = "arena-grid";
+    grid.textContent = "loading…";
+
+    el.append(bar, grid);
+
+    bar.addEventListener("click", e => {
+      const btn = e.target.closest(".af-btn");
+      if (!btn) return;
+      bar.querySelectorAll(".af-btn").forEach(x => x.classList.toggle("active", x === btn));
+      const cat = btn.dataset.cat;
+      grid.querySelectorAll(".arena-card").forEach(card => {
+        card.hidden = !(cat === "all" || card.dataset.cat === cat);
+      });
+    });
+
+    loadArena(grid);
+  });
+}
+
+function loadArena(grid) {
+  Promise.all(ARENA_CATS.map(c =>
+    fetch(`https://api.are.na/v2/channels/${c.slug}?per=100`)
+      .then(r => r.json())
+      .then(d => ({ cat: c.cat, items: d.contents || [] }))
+      .catch(() => ({ cat: c.cat, items: [] }))
+  )).then(results => {
+    grid.textContent = "";
+    let n = 0;
+    results.forEach(({ cat, items }) => items.forEach(b => {
+      grid.appendChild(makeArenaCard(b, cat));
+      n++;
+    }));
+    if (!n) grid.textContent = "Nothing to show yet.";
+  }).catch(() => { grid.textContent = "Couldn't load the archive."; });
+}
+
+function makeArenaCard(b, cat) {
+  const src = b.source || {};
+  const href = src.url || (b.id ? `https://www.are.na/block/${b.id}` : "#");
+  const img = b.image && ((b.image.display && b.image.display.url) || (b.image.thumb && b.image.thumb.url));
+  const title = decodeEntities(b.title || b.generated_title || src.title || "(untitled)");
+  const desc = b.description ? decodeEntities(b.description) : "";
+
+  const a = document.createElement("a");
+  a.className = "arena-card";
+  a.href = href; a.target = "_blank"; a.rel = "noopener";
+  a.dataset.cat = cat;
+
+  const thumb = document.createElement("div");
+  thumb.className = "ac-thumb";
+  if (img) {
+    const im = document.createElement("img");
+    im.src = img; im.alt = ""; im.loading = "lazy";
+    thumb.appendChild(im);
+  } else {
+    thumb.classList.add("ac-noimg");
+  }
+
+  const body = document.createElement("div");
+  body.className = "ac-body";
+  const t = document.createElement("div");
+  t.className = "ac-title"; t.textContent = title;
+  body.appendChild(t);
+  if (desc) {
+    const d = document.createElement("div");
+    d.className = "ac-desc"; d.textContent = desc;
+    body.appendChild(d);
+  }
+
+  a.append(thumb, body);
+  return a;
+}
+
+// decode HTML entities (e.g. &amp; -> &) safely, returning plain text
+function decodeEntities(s) {
+  const t = document.createElement("textarea");
+  t.innerHTML = s;
+  return t.value;
 }
 
 // type segments into a container, character by character
