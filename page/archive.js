@@ -14,7 +14,8 @@ const NAV = [
   { key: "about",               label: "about",               href: "archive.html" },
 ];
 
-const SPEED = 28; // ms per character (typing speed)
+const SPEED = 28;       // ms per character (typing speed)
+const MASCOT_GAP = 26;  // vertical gap (px) from the speech bubble down to the mascot
 
 document.addEventListener("DOMContentLoaded", () => {
   // grab the per-page bits BEFORE we rebuild the body
@@ -68,11 +69,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const bubble = document.getElementById("bubble");
   const mascot = document.getElementById("mascot");
   const bubbleText = document.getElementById("bubbleText");
+  const segs = fragToSegments(speechFrag);
+
+  // anchor the mascot a fixed gap below the bubble's full height + tail, so
+  // the spacing looks the same regardless of how long the speech is
+  bubbleText.textContent = segs.map(s => s.text).join("");        // measure full height
+  mascot.style.top = (bubble.offsetTop + bubble.offsetHeight + MASCOT_GAP) + "px";
+  bubbleText.textContent = "";                                     // clear, ready to type
 
   setTimeout(() => {
     mascot.classList.add("show");
     bubble.classList.add("show");
-    typeSegments(bubbleText, fragToSegments(speechFrag), SPEED);
+    typeSegments(bubbleText, segs, SPEED);
   }, 300);
 });
 
