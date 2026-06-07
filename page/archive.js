@@ -228,12 +228,16 @@ function setupRandomGames(root) {
 
 // load Ruffle from the CDN on demand (only the first time it's needed)
 let rufflePromise = null;
+const RUFFLE_BASE = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/";
 function ensureRuffle() {
   if (window.RufflePlayer && window.RufflePlayer.newest) return Promise.resolve();
   if (rufflePromise) return rufflePromise;
+  // tell Ruffle where to fetch its .wasm from (needed when loaded off a CDN)
+  window.RufflePlayer = window.RufflePlayer || {};
+  window.RufflePlayer.config = Object.assign({ publicPath: RUFFLE_BASE }, window.RufflePlayer.config || {});
   rufflePromise = new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/ruffle.js";
+    s.src = RUFFLE_BASE + "ruffle.js";
     s.onload = resolve;
     s.onerror = reject;
     document.head.appendChild(s);
