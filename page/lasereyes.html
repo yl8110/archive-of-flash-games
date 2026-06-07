@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unwrapping — lasereyes</title>
+  <link rel="stylesheet" href="archive.css" />
+</head>
+
+<!-- data-page=collecting-memory keeps "collecting memory" highlighted in the menu -->
+<body data-page="collecting-memory">
+
+  <!-- 礼物盒说的话 -->
+  <template id="speech">Let's see what people remember about this game.</template>
+
+  <!-- ★★★ 右侧主体内容 ★★★ -->
+  <template id="main">
+
+    <!-- ① 游戏名标题(待补充):居中、加粗、红色 -->
+    <h1 class="game-title">(game name 待补充)</h1>
+
+    <!-- ② 两栏:左=封面图,右=信息 -->
+    <div class="game-top">
+      <div class="game-cover">
+        <!-- 封面图待补充。替换下面这行为: <img src="../image/封面图.png" alt="cover"> -->
+        <div class="cover-placeholder">cover image 待补充</div>
+      </div>
+      <div class="game-meta">
+        <!-- archive 式信息(待补充) -->
+        <p><span class="meta-label">Aliases</span><br>待补充</p>
+      </div>
+    </div>
+
+    <!-- ③ Flash 游戏播放器:把 .swf 链接填进 data-swf -->
+    <div class="flash-player" data-swf=""></div>
+
+    <!-- ④ Memorys 区(左对齐标题) -->
+    <h2 class="memories-title">Memorys</h2>
+
+    <!-- ⑤ are.na channel(待补充):把频道 slug 填进 data-channel -->
+    <div class="arena-archive" data-channel=""></div>
+
+  </template>
+
+  <script src="archive.js"></script>
+</body>
+</html>

@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // wire up any <div class="random-game"> placeholders
   setupRandomGames(document.getElementById("mainPanel"));
 
+  // wire up any <div class="flash-player" data-swf="..."> placeholders
+  setupFlashPlayers(document.getElementById("mainPanel"));
+
   // wire up any <div class="arena-archive"> placeholders
   setupArenaArchives(document.getElementById("mainPanel"));
 
@@ -243,25 +246,56 @@ function whenRuffleReady(cb) {
 }
 
 function loadRandomGame(host, status) {
+  const game = GAMES[Math.floor(Math.random() * GAMES.length)];
+  playSwf(host, status, game.url, game.name);
+}
+
+// load a specific .swf into a host element via Ruffle
+function playSwf(host, status, url, name) {
   status.classList.remove("hidden");
-  status.textContent = "loading…";
+  status.textContent = name ? "loading " + name + "…" : "loading…";
   ensureRuffle().then(() => whenRuffleReady(() => {
-    const game = GAMES[Math.floor(Math.random() * GAMES.length)];
-    status.textContent = "loading " + game.name + "…";
     const ruffle = window.RufflePlayer.newest();
     host.innerHTML = "";                       // fresh player each time
     const player = ruffle.createPlayer();
     host.appendChild(player);
-    player.load({ url: game.url, autoplay: "on", unmuteOverlay: "visible", scale: "showAll" })
+    player.load({ url: url, autoplay: "on", unmuteOverlay: "visible", scale: "showAll" })
       .then(() => status.classList.add("hidden"))
       .catch(err => {
         console.error(err);
         status.classList.remove("hidden");
-        status.textContent = "couldn't load " + game.name + " — click the link to try another";
+        status.textContent = (name ? "couldn't load " + name : "couldn't load this game") + " — try again";
       });
   })).catch(() => {
     status.classList.remove("hidden");
     status.textContent = "couldn't load the Flash player — check your connection";
+  });
+}
+
+/* ============================================================
+   Specific Flash game player.
+   Drop <div class="flash-player" data-swf="URL_TO.swf"></div> into a
+   page. Shows a frame; click it to load that one game with Ruffle.
+   ============================================================ */
+function setupFlashPlayers(root) {
+  root.querySelectorAll(".flash-player").forEach(el => {
+    const url = (el.dataset.swf || "").trim();
+    el.innerHTML = `
+      <div class="player-frame">
+        <div class="game-host"></div>
+        <div class="player-status"></div>
+      </div>`;
+    const frame  = el.querySelector(".player-frame");
+    const host   = el.querySelector(".game-host");
+    const status = el.querySelector(".player-status");
+    if (!url) {
+      status.textContent = "把 .swf 链接填进 data-swf 即可加载游戏";
+      return;
+    }
+    status.textContent = "▶ click to play";
+    frame.style.cursor = "pointer";
+    const start = () => { frame.removeEventListener("click", start); playSwf(host, status, url); };
+    frame.addEventListener("click", start);
   });
 }
 
@@ -280,6 +314,21 @@ const ARENA_FILTERS = ["all", "archive", "live", "decay"];
 
 function setupArenaArchives(root) {
   root.querySelectorAll(".arena-archive").forEach(el => {
+    // Single-channel mode: data-channel="slug" (+ optional data-links="a.html, b.html"
+    // to make the cards link to internal pages by order). No filter bar.
+    if (el.hasAttribute("data-channel")) {
+      const slug  = (el.dataset.channel || "").trim();
+      const links = (el.dataset.links || "").split(",").map(s => s.trim()).filter(Boolean);
+      const grid  = document.createElement("div");
+      grid.className = "arena-grid";
+      el.appendChild(grid);
+      if (!slug) { grid.textContent = "把 are.na 频道 slug 填进 data-channel"; return; }
+      grid.textContent = "loading…";
+      loadArenaChannel(grid, slug, links);
+      return;
+    }
+
+    // Default mode: the game-archives sub-channels with an all|archive|live|decay filter.
     const bar = document.createElement("div");
     bar.className = "arena-filter";
     ARENA_FILTERS.forEach((f, i) => {
@@ -310,6 +359,19 @@ function setupArenaArchives(root) {
   });
 }
 
+// fetch one channel and render its blocks; links[i] makes card i link internally
+function loadArenaChannel(grid, slug, links) {
+  fetch(`https://api.are.na/v2/channels/${slug}?per=100`)
+    .then(r => r.json())
+    .then(d => {
+      grid.textContent = "";
+      const items = d.contents || [];
+      items.forEach((b, i) => grid.appendChild(makeArenaCard(b, null, links[i])));
+      if (!items.length) grid.textContent = "Nothing here yet.";
+    })
+    .catch(() => { grid.textContent = "Couldn't load this channel."; });
+}
+
 function loadArena(grid) {
   Promise.all(ARENA_CATS.map(c =>
     fetch(`https://api.are.na/v2/channels/${c.slug}?per=100`)
@@ -327,17 +389,19 @@ function loadArena(grid) {
   }).catch(() => { grid.textContent = "Couldn't load the archive."; });
 }
 
-function makeArenaCard(b, cat) {
+function makeArenaCard(b, cat, internalHref) {
   const src = b.source || {};
-  const href = src.url || (b.id ? `https://www.are.na/block/${b.id}` : "#");
   const img = b.image && ((b.image.display && b.image.display.url) || (b.image.thumb && b.image.thumb.url));
-  const title = decodeEntities(b.title || b.generated_title || src.title || "(untitled)");
-  const desc = b.description ? decodeEntities(b.description) : "";
 
   const a = document.createElement("a");
   a.className = "arena-card";
-  a.href = href; a.target = "_blank"; a.rel = "noopener";
-  a.dataset.cat = cat;
+  if (internalHref) {
+    a.href = internalHref;                     // link to another page on this site
+  } else {
+    a.href = src.url || (b.id ? `https://www.are.na/block/${b.id}` : "#");
+    a.target = "_blank"; a.rel = "noopener";
+  }
+  if (cat) a.dataset.cat = cat;
 
   const thumb = document.createElement("div");
   thumb.className = "ac-thumb";
@@ -348,19 +412,24 @@ function makeArenaCard(b, cat) {
   } else {
     thumb.classList.add("ac-noimg");
   }
+  a.appendChild(thumb);
 
-  const body = document.createElement("div");
-  body.className = "ac-body";
-  const t = document.createElement("div");
-  t.className = "ac-title"; t.textContent = title;
-  body.appendChild(t);
-  if (desc) {
-    const d = document.createElement("div");
-    d.className = "ac-desc"; d.textContent = desc;
-    body.appendChild(d);
+  // internal-link cards show the image only; external cards add title + description
+  if (!internalHref) {
+    const title = decodeEntities(b.title || b.generated_title || src.title || "(untitled)");
+    const desc = b.description ? decodeEntities(b.description) : "";
+    const body = document.createElement("div");
+    body.className = "ac-body";
+    const t = document.createElement("div");
+    t.className = "ac-title"; t.textContent = title;
+    body.appendChild(t);
+    if (desc) {
+      const d = document.createElement("div");
+      d.className = "ac-desc"; d.textContent = desc;
+      body.appendChild(d);
+    }
+    a.appendChild(body);
   }
-
-  a.append(thumb, body);
   return a;
 }
 
