@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>game-laser-eyes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background: white;
+      color: black;
+    }
+
+    a { color: blue; }
+    a:visited { color: purple; }
+
+    header {
+      padding: 40px 20px 20px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    header .meta {
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    /* 单列竖向信息流，居中 */
+    .grid {
+      max-width: 640px;       /* 想更宽/更窄改这个数值即可 */
+      margin: 0 auto;         /* 居中 */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .block {
+      width: 100%;
+    }
+
+    /* 截图按原始比例显示，绝不放大，居中 */
+    .block-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+
+    .block-placeholder {
+      width: 100%;
+      min-height: 120px;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .block-text-content {
+      width: 100%;
+      padding: 16px;
+      background: black;
+      color: white;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+        /* 翻译默认隐藏 */
+    .block-translation {
+      display: none;
+      padding: 12px 14px 16px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #333;
+      text-align: left;
+      border-top: 1px dashed #999;
+    }
+
+    /* 点击后才展开 */
+    .block.open .block-translation {
+      display: block;
+    }
+
+    .block.has-translation {
+      cursor: pointer;
+      position: relative;     /* 给 EN 角标定位用 */
+    }
+
+    /* EN 角标：默认隐形 */
+    .block.has-translation::after {
+      content: "EN";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+      color: #555;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #999;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;   /* 不挡点击 */
+    }
+
+    /* 鼠标悬停、且还没展开时浮现 */
+    .block.has-translation:hover::after {
+      opacity: 1;
+    }
+
+    /* 点开之后消失（即使还悬停着） */
+    .block.has-translation.open::after {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5My9vcmlnaW5hbF80NWNkNzI5ODE0NjZmMmE0YzgzNDYzZDA0OGVjZWM1ZC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.26.02" loading="lazy" />
+      
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5NC9vcmlnaW5hbF8wNWJhM2MxZmE2MWM1ZGU5NWM3OWM0ZDhlOWM5ODk4YS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.27.20" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5Ni9vcmlnaW5hbF9lZTk5ODgzZDJlZGI2NzViZjY0NjE0YmY0Y2IxMWFlNC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.46.35" loading="lazy" />
+      <div class="block-translation">“When I was a kid, my computer was bad, but somehow I could get the highest score because it lagged so much. Now that computers respond properly, my hand speed gets exposed.”</div>
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5OC9vcmlnaW5hbF8xM2FjMmU2OTA3MzM4YTRmMGQ3NzU1ZGVkOGU3YmYwZi5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.27.02" loading="lazy" />
+      
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwMS9vcmlnaW5hbF9iZjkxODI5NDExZmM0NjMxZTRiNzdmNmI0NzQ2MjQ2YS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.26.21" loading="lazy" />
+      
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwOC9vcmlnaW5hbF9kNDA4ZjJlYzcyMzMxNDVkNTVjMjY0NzdlZTlhNGNiOS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.27.37" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMxMC9vcmlnaW5hbF9kOGRhZjg4NTNlNDQ3OTM3YmEwZmQyYjk1MTk2MDAzNS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.50.16" loading="lazy" />
+      <div class="block-translation">“When I was little, these were the three must-play games in computer class. The other two were Gold Miner and Bomberman.”</div>
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwNi9vcmlnaW5hbF84M2I2NDE1OTc1NmI0ZGIxZWQ2ODlhZTAzNDg0NTQ5Ny5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.23.14" loading="lazy" />
+      
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwMC9vcmlnaW5hbF84ZDU3ZmY3MTc4MGNhZGFjMDgyODBhODY3ZDJkN2MzMC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.24.56" loading="lazy" />
+      
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwNC9vcmlnaW5hbF9jOGViZjJkYzhmYzU3MzY5ZGVjNWE4YzNjODI0YmE3NC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.22.58" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwOS9vcmlnaW5hbF84MDNmZDE5OTVhYTUxNzdkNmQ5NGFhZTg1ODg2MWZhZC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.52.31" loading="lazy" />
+      <div class="block-translation">“I miss this so much. I especially loved it when I was a kid. It took me several tries to finally get this high score.”</div>
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwNS9vcmlnaW5hbF82MDIxYzBlNjU2YzY2ZjQzMDdiMDgwNjVhY2YwYWQwNi5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.25.34" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwMy9vcmlnaW5hbF9iMTA0Mjk1MGNjZmJmYjZlMGRiZWZkYTIyZDE2Y2E0Yy5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.47.12" loading="lazy" />
+      <div class="block-translation">“When I was a kid playing this, my dad scolded me for ruining the mouse.”</div>
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5NS9vcmlnaW5hbF9mNTBiZDk3M2Y5ZGY2MTMzM2ZhYmQxMWMyM2E3OTI2Yi5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.25.06" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMxMS9vcmlnaW5hbF8wYmIzZWM4YjliMjA4NzdlMGQxMzkxNTlhZDEwNmYyNy5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.52.11" loading="lazy" />
+      <div class="block-translation">“This game had an arcade version. I played it before — you started the game by inserting a one-yuan coin.”</div>
+    </div>
+
+    <div class="block">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5Ny9vcmlnaW5hbF9kODQyMzVkNWJiMWU1NmFkODk5YzhhN2U4MjVjZDQ3NC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.24.05" loading="lazy" />
+      
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwMi9vcmlnaW5hbF9lMzExMWFiOTJhZGU0ZWIzNjFjOGQ3ZmQ2OGE0MjA2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.48.15" loading="lazy" />
+      <div class="block-translation">“When I was a kid, I broke three mice playing this game and got yelled at so badly by my dad.”
+
+</div>
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjI5OS9vcmlnaW5hbF80ZmI3Yzc4NThlM2VkMWIwNDMxOWE3Mjc0OWQwMmJmOS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.47.51" loading="lazy" />
+      <div class="block-translation">“When I was a kid, I played this with my little sister. We’d click together with one wired mouse and one wireless mouse, just massacring everything hahahahahahahaha.”
+
+</div>
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjMwNy9vcmlnaW5hbF82YWY4ZWMyZmNmYjkwMDJjZTI4NDg1YzA4YjAzZjA5MC5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午5.49.34" loading="lazy" />
+      <div class="block-translation">“When I was a kid, I could never beat the last stage and didn’t know how to use macros. It wasn’t until later, when I played it on my dad’s work computer, that I found out his Twin Flying Swallow mouse had a small red button next to the left click, with ‘×2’ written above it.”</div>
+    </div>
+
+    <div class="block has-translation">
+      <img class="block-image" src="https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI0NjczMjUxNC9vcmlnaW5hbF8yOTc1OWZkYWQyOWUzY2QzZDI3MmE4NGQ2MWI4NzNiOS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6MTIwMCwiZml0IjoiaW5zaWRlIiwid2l0aG91dEVubGFyZ2VtZW50Ijp0cnVlfSwid2VicCI6eyJxdWFsaXR5Ijo3NX0sImpwZWciOnsicXVhbGl0eSI6NzV9LCJyb3RhdGUiOm51bGx9fQ==?bc=0" alt="截屏2026-06-03 下午7.45.48" loading="lazy" />
+      <div class="block-translation">“I remember playing this game like crazy to get two kids who were good at it… lol. It was the only game where my younger sibling would help me when I asked for help lol.”</div>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.block.has-translation').forEach(function (b) {
+      b.addEventListener('click', function () {
+        b.classList.toggle('open');
+      });
+    });
+  </script>
+</body>
+</html>

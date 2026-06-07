@@ -68,6 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // wire up any <div class="arena-archive"> placeholders
   setupArenaArchives(document.getElementById("mainPanel"));
 
+  // wire up any <div class="memory-embed" data-src="..."> placeholders
+  setupEmbeds(document.getElementById("mainPanel"));
+
   // reveal mascot + speech bubble, then type the words out
   const bubble = document.getElementById("bubble");
   const mascot = document.getElementById("mascot");
@@ -431,6 +434,31 @@ function makeArenaCard(b, cat, internalHref) {
     a.appendChild(body);
   }
   return a;
+}
+
+/* ============================================================
+   Embed a local HTML page (e.g. a styled comment feed) as an
+   auto-resizing iframe. <div class="memory-embed" data-src="x.html">
+   The iframe grows to its content height (no inner scrollbar).
+   ============================================================ */
+function setupEmbeds(root) {
+  root.querySelectorAll(".memory-embed").forEach(el => {
+    const src = (el.dataset.src || "").trim();
+    if (!src) { el.textContent = "把评论区 HTML 文件名填进 data-src"; return; }
+    const f = document.createElement("iframe");
+    f.className = "embed-frame";
+    f.src = src;
+    f.addEventListener("load", () => {
+      const fit = () => { try { f.style.height = f.contentDocument.documentElement.scrollHeight + "px"; } catch (e) {} };
+      fit();
+      try {
+        const doc = f.contentDocument;
+        if (window.ResizeObserver) new ResizeObserver(fit).observe(doc.body);
+        doc.querySelectorAll("img").forEach(img => { if (!img.complete) img.addEventListener("load", fit); });
+      } catch (e) { f.style.height = "600px"; }
+    });
+    el.appendChild(f);
+  });
 }
 
 // decode HTML entities (e.g. &amp; -> &) safely, returning plain text
