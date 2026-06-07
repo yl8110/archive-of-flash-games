@@ -158,3 +158,35 @@ body {
   border: 1px solid var(--border);
   padding: 24px 28px;
 }
+
+/* ===================== ESSAY / STRETCHTEXT ===================== */
+.essay {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #222;
+  max-width: 64ch;
+}
+.essay a { color: var(--red); text-decoration: underline; }
+.essay a:hover { color: var(--purple); }
+
+/* collapsed: only the short phrase shows; expanded: the long text + ▴ */
+.stretch.collapsed > .stretch-body,
+.stretch.collapsed > .collapse-btn { display: none; }
+.stretch.expanded  > .trigger { display: none; }
+
+.trigger {
+  color: var(--red);
+  border-bottom: 1px dotted var(--red);
+  cursor: pointer;
+}
+.trigger:hover { color: var(--purple); border-bottom-color: var(--purple); }
+
+.collapse-btn {
+  cursor: pointer;
+  color: var(--red);
+  font-size: 0.7em;
+  vertical-align: super;
+  margin-left: 1px;
+  user-select: none;
+}
+.collapse-btn:hover { color: var(--purple); }
