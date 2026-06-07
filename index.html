@@ -46,14 +46,13 @@
       cursor: pointer;
     }
 
-    /* top-left broken-image glyph — intentionally points at a missing file
-       so the browser renders its "failed to load" icon (sells the gag) */
+    /* top-left "broken image" glyph (clean SVG — no UA border ring) */
     .broken {
       position: absolute;
       top: 14px;
       left: 14px;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
     }
 
     /* top-centre clickable "logo" text */
@@ -85,7 +84,7 @@
     /* ===================== MASCOT ===================== */
     .mascot {
       position: absolute;
-      left: 80px;
+      left: -45px;            /* centred directly under the speech-bubble tail */
       bottom: 0;
       width: 170px;
       opacity: 0;
@@ -157,8 +156,16 @@
 <body>
   <main class="stage">
     <section class="screen" id="screen">
-      <!-- broken-image gag (missing file on purpose) -->
-      <img class="broken" src="image/flash-content.png" alt="" />
+      <!-- broken-image gag (clean SVG, no grey UA frame) -->
+      <svg class="broken" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="2" y1="2" x2="22" y2="22" />
+        <path d="M10.41 10.41a2 2 0 1 1-2.83-2.83" />
+        <line x1="13.5" y1="13.5" x2="6" y2="21" />
+        <line x1="18" y1="18" x2="21" y2="21" />
+        <path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.05-.22 1.41-.59" />
+        <path d="M21 15V5a2 2 0 0 0-2-2H9" />
+      </svg>
 
       <!-- clickable logo -->
       <div class="logo" id="logo">ilovetoplayflashgame.com</div>
