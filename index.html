@@ -3,265 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Archive of Flash Games — Under Construction</title>
-
-  <!-- Ruffle: open-source Flash Player emulator (WebAssembly). Loaded from CDN. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/ruffle.js"></script>
+  <title>ilovetoplayflashgame.com</title>
 
   <style>
     :root {
-      --player-border: #c81414;   /* red frame */
-      --player-bg:     #141b2e;    /* dark navy screen */
+      --bg:      #cccccc;   /* grey page background */
+      --red:     #cc2b2b;   /* red text / accents */
+      --border:  #e0726e;   /* light red frame */
+      --purple:  #8a2be2;   /* hover / active colour */
+      --bubble:  #e8231f;   /* speech-bubble fill */
     }
 
     * { box-sizing: border-box; }
 
+    html, body { height: 100%; }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      background: #ffffff;
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      color: #111;
+      background: var(--bg);
+      font-family: system-ui, "Segoe UI", -apple-system, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* ---- Main stage: holds the player (center) + character (lower-left) ---- */
+    /* ---- stage = white screen + welcome line under it ---- */
     .stage {
-      position: relative;
-      width: 100%;
-      max-width: 1100px;
-      padding: 40px 20px;
       display: flex;
-      justify-content: center;
-    }
-
-    /* ===================== FLASH GAME PLAYER ===================== */
-    .player-frame {
-      width: 565px;
-      max-width: 90vw;
-      aspect-ratio: 4 / 3;
-      border: 10px solid var(--player-border);
-      background: var(--player-bg);
-      display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      gap: 18px;
+    }
+
+    /* ===================== WHITE SCREEN ===================== */
+    .screen {
       position: relative;
-    }
-
-    /* Ruffle injects its own element here; this fills the frame */
-    #game-player,
-    #game-player ruffle-player,
-    #game-player ruffle-embed {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .player-status {
-      position: absolute;
-      color: #6b7280;
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      pointer-events: none;
-      text-align: center;
-      padding: 0 20px;
-    }
-
-    .player-status.hidden { display: none; }
-
-    /* small "another game" button under the frame */
-    .reroll {
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
-      background: var(--player-border);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      opacity: 0.9;
-    }
-    .reroll:hover { opacity: 1; }
-
-    /* ============ CHARACTER + SPEECH BUBBLE (lower-left) ============ */
-    .character-group {
-      position: absolute;
-      left: 0;
-      bottom: 40px;
-      width: 280px;
-      /* keep it from overlapping the player on narrow screens */
-    }
-
-    /* ---- SPEECH BUBBLE (edit the text inside) ---- */
-    .speech-bubble {
-      position: relative;
+      width: min(860px, 92vw);
+      height: min(556px, 72vh);
       background: #fff;
-      border: 3px solid #000;
-      border-radius: 24px;
-      padding: 16px 20px;
-      font-weight: 700;
-      font-size: 17px;
-      line-height: 1.3;
-      max-width: 240px;
+      border: 1px solid var(--border);
+      overflow: visible;          /* let the speech bubble spill past the left edge */
+      cursor: pointer;
     }
-    /* bubble tail */
-    .speech-bubble::after {
+
+    /* top-left broken-image glyph — intentionally points at a missing file
+       so the browser renders its "failed to load" icon (sells the gag) */
+    .broken {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 22px;
+      height: 22px;
+    }
+
+    /* top-centre clickable "logo" text */
+    .logo {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: var(--red);
+      font-size: 21px;
+      user-select: none;
+      transition: color 0.12s ease;
+    }
+    .logo:hover,
+    .logo:active { color: var(--purple); }
+
+    /* welcome line beneath the screen */
+    .welcome {
+      color: var(--red);
+      font-size: 21px;
+      user-select: none;
+    }
+
+    /* refresh blink: blank the page briefly, like a reload */
+    .refreshing .screen,
+    .refreshing .welcome { visibility: hidden; }
+
+    /* ===================== MASCOT ===================== */
+    .mascot {
+      position: absolute;
+      left: 80px;
+      bottom: 0;
+      width: 170px;
+      opacity: 0;
+      transform: translateY(12px) scale(0.9);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+    .mascot.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ===================== SPEECH BUBBLE ===================== */
+    .bubble {
+      position: absolute;
+      left: -95px;
+      bottom: 168px;
+      width: 205px;
+      background: var(--bubble);
+      border: 4px solid #000;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #111;
+      font-size: 16px;
+      line-height: 1.25;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .bubble.show { opacity: 1; }
+
+    /* bubble tail (points down toward the mascot) */
+    .bubble::before,
+    .bubble::after {
       content: "";
       position: absolute;
-      left: 150px;
       bottom: -26px;
-      border-width: 28px 22px 0 0;
+      right: 40px;
+      width: 0;
+      height: 0;
       border-style: solid;
+    }
+    .bubble::before {              /* black outline of the tail */
+      border-width: 28px 26px 0 0;
       border-color: #000 transparent transparent transparent;
     }
-    .speech-bubble::before {
-      content: "";
-      position: absolute;
-      left: 150px;
-      bottom: -20px;
-      border-width: 22px 17px 0 0;
-      border-style: solid;
-      border-color: #fff transparent transparent transparent;
-      z-index: 1;
+    .bubble::after {               /* red fill of the tail */
+      bottom: -19px;
+      right: 45px;
+      border-width: 20px 18px 0 0;
+      border-color: var(--bubble) transparent transparent transparent;
     }
 
-    /* ---- CHARACTER IMAGE (drop your cartoon pic here) ---- */
-    .character {
-      margin-top: 24px;
-      margin-left: 120px;
-      width: 170px;
-      height: 170px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      font-size: 12px;
-      text-align: center;
-    }
-    .character img { max-width: 100%; max-height: 100%; display: block; }
+    .bubble-text { margin: 0; }
+    .bubble-text em { font-style: italic; }
 
-    @media (max-width: 820px) {
-      .character-group { position: static; width: auto; margin-top: 30px; }
-      .stage { flex-direction: column-reverse; align-items: center; gap: 24px; }
+    .archive-link {
+      display: none;
+      margin-top: 8px;
+      color: #111;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.12s ease;
     }
+    .archive-link:hover,
+    .archive-link:active { color: var(--purple); }
   </style>
 </head>
 
 <body>
   <main class="stage">
+    <section class="screen" id="screen">
+      <!-- broken-image gag (missing file on purpose) -->
+      <img class="broken" src="image/flash-content.png" alt="" />
 
-    <!-- ============================================================
-         FLASH GAME PLAYER
-         A random game from the archive loads here on every page open.
-         ============================================================ -->
-    <section class="player-frame">
-      <div id="game-player"></div>
-      <div class="player-status" id="player-status">loading flash game…</div>
-      <button class="reroll" id="reroll" title="Load another random game">🎲 another game</button>
+      <!-- clickable logo -->
+      <div class="logo" id="logo">ilovetoplayflashgame.com</div>
+
+      <!-- speech bubble (revealed after the click) -->
+      <div class="bubble" id="bubble">
+        <p class="bubble-text" id="bubbleText"></p>
+        <a class="archive-link" id="archiveLink" href="page/archive.html"></a>
+      </div>
+
+      <!-- mascot (revealed after the click) -->
+      <img class="mascot" id="mascot" src="image/box_default.png" alt="mascot" />
     </section>
 
-    <!-- ============================================================
-         CHARACTER + SPEECH BUBBLE  (lower-left, like the mockup)
-         👉 EDIT the bubble text below.
-         👉 REPLACE the .character placeholder with your cartoon <img>.
-         ============================================================ -->
-    <div class="character-group">
-
-      <!-- ▼▼▼ SPEECH BUBBLE TEXT — edit this ▼▼▼ -->
-      <div class="speech-bubble" id="speech-bubble">
-        The website is under construction! Play a flash game while waiting…
-      </div>
-      <!-- ▲▲▲ SPEECH BUBBLE TEXT ▲▲▲ -->
-
-      <!-- ▼▼▼ CARTOON CHARACTER — replace placeholder with your image ▼▼▼ -->
-      <div class="character">
-        <img src="image/box_default.png" alt="mascot">
-      </div>
-      <!-- ▲▲▲ CARTOON CHARACTER ▲▲▲ -->
-
-    </div>
+    <div class="welcome">- welcome to ilovetoplayflashgame.com! Click on the logo to start -</div>
   </main>
 
   <script>
-    /* =========================================================
-       RANDOM FLASH GAME LOADER
-       Games are SWF files served from public GitHub archives via
-       the jsDelivr CDN (CORS-enabled, so the browser can fetch them).
-       Add/remove entries freely — { name, url }.
-       ========================================================= */
-    const GAMES = [
-      { name: "Mutilate-a-Doll",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/mutilateadoll.swf" },
-      { name: "Reach the Core",   url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/reachthecore.swf" },
-      { name: "Terrasavr",        url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/terrasavr.swf" },
-      { name: "Papa's Bakeria",   url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasbakeria_101.swf" },
-      { name: "Papa's Cheeseria", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papascheeseria_102.swf" },
-      { name: "Papa's Donuteria", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasdonuteria_102.swf" },
-      { name: "Papa's Pastaria",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papaspastaria_v2.swf" },
-      { name: "Papa's Scooperia", url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papasscooperia_v102.swf" },
-      { name: "Papa's Sushiria",  url: "https://cdn.jsdelivr.net/gh/HamsterThatCommitsStuff/SWF-Archive@master/papassushiria_101.swf" },
-      { name: "Rumble",           url: "https://cdn.jsdelivr.net/gh/Noagi6493/FlashGamesArchive@main/Rumble_Newgrounds.swf" },
+    const screen      = document.getElementById("screen");
+    const bubble      = document.getElementById("bubble");
+    const mascot      = document.getElementById("mascot");
+    const bubbleText  = document.getElementById("bubbleText");
+    const archiveLink = document.getElementById("archiveLink");
+
+    // bubble paragraph, split so "around" can be italic mid-sentence
+    const PARAGRAPH = [
+      { text: "Looks like this flash game website failed to load! However, I could still show you ", italic: false },
+      { text: "around", italic: true },
+      { text: ".", italic: false },
     ];
+    const LINK_TEXT = "🔘Go to the archive";
+    const SPEED = 28; // ms per character
 
-    const statusEl = document.getElementById("player-status");
-    const container = document.getElementById("game-player");
-    let player = null;
+    let started = false;
 
-    function pickRandom() {
-      return GAMES[Math.floor(Math.random() * GAMES.length)];
+    // type a list of {text, italic} segments into a container, char by char
+    function typeSegments(container, segments, speed, done) {
+      let si = 0, ci = 0, cur = null;
+      (function step() {
+        if (si >= segments.length) { if (done) done(); return; }
+        const seg = segments[si];
+        const chars = [...seg.text];
+        if (ci === 0) {
+          cur = document.createElement(seg.italic ? "em" : "span");
+          container.appendChild(cur);
+        }
+        if (ci < chars.length) {
+          cur.textContent += chars[ci++];
+          setTimeout(step, speed);
+        } else {
+          si++; ci = 0; setTimeout(step, speed);
+        }
+      })();
     }
 
-    function loadGame(game) {
-      statusEl.textContent = "loading " + game.name + "…";
-      statusEl.classList.remove("hidden");
+    function typeText(el, text, speed, done) {
+      typeSegments(el, [{ text: text, italic: false }], speed, done);
+    }
 
-      const ruffle = window.RufflePlayer.newest();
-      // fresh player each time so re-rolls start clean
-      container.innerHTML = "";
-      player = ruffle.createPlayer();
-      container.appendChild(player);
-
-      player.addEventListener("loadedmetadata", () => statusEl.classList.add("hidden"));
-
-      player.load({
-        url: game.url,
-        autoplay: "on",
-        unmuteOverlay: "visible",
-        // games are designed for a fixed stage; let Ruffle scale to the frame
-        scale: "showAll",
-      }).then(() => {
-        statusEl.classList.add("hidden");
-      }).catch((err) => {
-        console.error(err);
-        statusEl.classList.remove("hidden");
-        statusEl.textContent = "couldn't load " + game.name + " — try another game 🎲";
+    function reveal() {
+      mascot.classList.add("show");
+      bubble.classList.add("show");
+      typeSegments(bubbleText, PARAGRAPH, SPEED, () => {
+        archiveLink.style.display = "block";
+        typeText(archiveLink, LINK_TEXT, SPEED);
       });
     }
 
-    // Ruffle installs window.RufflePlayer asynchronously after its script loads.
-    function whenRuffleReady(cb) {
-      if (window.RufflePlayer && window.RufflePlayer.newest) return cb();
-      const t = setInterval(() => {
-        if (window.RufflePlayer && window.RufflePlayer.newest) {
-          clearInterval(t);
-          cb();
-        }
-      }, 50);
-      // give up after ~10s
-      setTimeout(() => clearInterval(t), 10000);
-    }
+    screen.addEventListener("click", () => {
+      if (started) return;          // ignore clicks once the sequence has begun
+      started = true;
 
-    window.addEventListener("load", () => {
-      whenRuffleReady(() => loadGame(pickRandom()));
-    });
+      // 1) "refresh" blink — blank the page like a reload
+      document.body.classList.add("refreshing");
+      setTimeout(() => document.body.classList.remove("refreshing"), 320);
 
-    document.getElementById("reroll").addEventListener("click", () => {
-      whenRuffleReady(() => loadGame(pickRandom()));
+      // 2) one second later, bring in the mascot + typed dialogue
+      setTimeout(reveal, 1000);
     });
   </script>
 </body>

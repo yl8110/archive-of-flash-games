@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Archive — ilovetoplayflashgame.com</title>
+
+  <style>
+    :root {
+      --bg:     #cccccc;
+      --red:    #cc2b2b;
+      --border: #e0726e;
+      --purple: #8a2be2;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: system-ui, "Segoe UI", -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .screen {
+      position: relative;
+      width: min(860px, 92vw);
+      height: min(556px, 72vh);
+      background: #fff;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    h1 { color: var(--red); margin: 0; font-size: 32px; }
+    p  { color: #555; margin: 0; }
+    .back {
+      position: absolute;
+      top: 16px;
+      left: 18px;
+      color: var(--red);
+      text-decoration: none;
+      transition: color 0.12s ease;
+    }
+    .back:hover,
+    .back:active { color: var(--purple); }
+  </style>
+</head>
+
+<body>
+  <section class="screen">
+    <a class="back" href="../index.html">&larr; back</a>
+    <h1>The Archive</h1>
+    <p>Coming soon — the flash games will live here.</p>
+  </section>
+</body>
+</html>
