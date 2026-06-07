@@ -165,6 +165,7 @@ body {
   line-height: 1.75;
   color: #222;
   max-width: 64ch;
+  margin: 0 auto;        /* centre the text block (text itself stays left-aligned) */
 }
 .essay a { color: var(--red); text-decoration: underline; }
 .essay a:hover { color: var(--purple); }
