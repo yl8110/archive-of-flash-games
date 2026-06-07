@@ -318,6 +318,11 @@ const ARENA_CATS = [
   { cat: "decay",   slug: "ga-type-decay" },
 ];
 const ARENA_FILTERS = ["all", "archive", "live", "decay"];
+const ARENA_DESC = {
+  archive: "websites preserving Flash games after official support ended",
+  live: "old Flash game websites still running through alternative plugins",
+  decay: "Flash game websites in various states of breakdown",
+};
 
 function setupArenaArchives(root) {
   root.querySelectorAll(".arena-archive").forEach(el => {
@@ -346,17 +351,22 @@ function setupArenaArchives(root) {
       b.textContent = f;
       bar.appendChild(b);
     });
+    const desc = document.createElement("div");
+    desc.className = "arena-desc";
+    desc.textContent = ARENA_DESC.all || "";   // "all" has no description
+
     const grid = document.createElement("div");
     grid.className = "arena-grid";
     grid.textContent = "loading…";
 
-    el.append(bar, grid);
+    el.append(bar, desc, grid);
 
     bar.addEventListener("click", e => {
       const btn = e.target.closest(".af-btn");
       if (!btn) return;
       bar.querySelectorAll(".af-btn").forEach(x => x.classList.toggle("active", x === btn));
       const cat = btn.dataset.cat;
+      desc.textContent = ARENA_DESC[cat] || "";
       grid.querySelectorAll(".arena-card").forEach(card => {
         card.hidden = !(cat === "all" || card.dataset.cat === cat);
       });

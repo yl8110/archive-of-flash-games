@@ -302,6 +302,15 @@ body {
 .af-btn:hover { color: var(--purple); }
 .af-btn.active { color: #111; text-decoration: underline; }
 
+.arena-desc {
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+  min-height: 18px;
+  margin: -8px 0 18px;
+}
+
 .arena-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
