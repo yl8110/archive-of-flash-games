@@ -14,14 +14,6 @@ const NAV = [
   { key: "about",               label: "about",               href: "archive.html" },
 ];
 
-// red flash "F" logo (swap for your own asset if you have one)
-const FLASH_LOGO = `
-  <svg class="flash-logo" viewBox="0 0 46 54" aria-hidden="true">
-    <rect x="1" y="1" width="44" height="52" rx="8" fill="#cc2b2b"/>
-    <text x="23" y="38" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-          font-style="italic" font-weight="bold" font-size="34" fill="#fff">F</text>
-  </svg>`;
-
 const SPEED = 28; // ms per character (typing speed)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -42,13 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.innerHTML = `
     <div class="wrap">
       <header class="banner">
-        ${FLASH_LOGO}
-        <div class="title"><span class="un">UN</span>WRAPPING</div>
-        <div class="slash">/</div>
-        <div class="tagline">
-          <div class="lead">an archive of the digital traces around flash games</div>
-          <div class="sub">Yan Liu &nbsp;|&nbsp; SPFC 2026 Spring Digital Decay and Afterlives Class</div>
-        </div>
+        <img class="banner-img" src="../image/banner.png" alt="UNWRAPPING — an archive of the digital traces around flash games" />
       </header>
 
       <div class="body-row">

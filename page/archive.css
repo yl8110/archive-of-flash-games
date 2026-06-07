@@ -29,45 +29,14 @@ body {
 
 /* ===================== TOP BANNER ===================== */
 .banner {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  width: max-content;
-  max-width: 100%;
   margin: 0 auto 22px;
-  padding: 10px 26px;
-  background: #fff;
-  border: 3px solid #000;
+  text-align: center;
 }
-
-.banner .flash-logo { width: 46px; height: 54px; flex: none; }
-
-.banner .title {
-  font-weight: 800;
-  font-size: 36px;
-  letter-spacing: -0.5px;
-  line-height: 1;
-  white-space: nowrap;
-}
-.banner .title .un { color: var(--red); }
-
-.banner .slash {
-  color: var(--red);
-  font-size: 52px;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.banner .tagline { line-height: 1.25; }
-.banner .tagline .lead {
-  color: var(--red);
-  font-weight: 800;
-  font-size: 18px;
-}
-.banner .tagline .sub {
-  color: #111;
-  font-weight: 700;
-  font-size: 14px;
+.banner .banner-img {
+  display: block;
+  margin: 0 auto;
+  width: min(900px, 100%);   /* tweak the max width here to resize the banner */
+  height: auto;
 }
 
 /* ===================== BODY ROW (sidebar | main) ===================== */
